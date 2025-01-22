@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Brochures</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .brochures {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .brochure-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .brochure-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .thumbnail-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background-color: #f7fafc;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .thumbnail-container:hover .thumbnail {
+            transform: scale(1.05);
+        }
+
+        .thumbnail-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .pdf-icon {
+            width: 64px;
+            height: 64px;
+            background-color: #e53e3e;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .click-to-view {
+            font-size: 0.875rem;
+            color: #718096;
+            text-align: center;
+        }
+
+        .brochure-info {
+            padding: 1rem;
+        }
+
+        .brochure-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .brochure-date {
+            color: #718096;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-button {
+            flex: 1;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            text-align: center;
+            background-color: #4299e1;
+            color: white;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .view-button:hover {
+            background-color: #3182ce;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.25rem;
+            color: #718096;
+            padding: 2rem;
+        }
+
+        .error {
+            text-align: center;
+            color: #e53e3e;
+            padding: 2rem;
+            background: #fff5f5;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            margin: 2% auto;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .close-button {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close-button:hover {
+            background: #c53030;
+        }
+
+        #pdf-viewer {
+            flex-grow: 1;
+            width: 100%;
+            height: calc(100% - 2rem);
+            border: none;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .brochures {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                height: 95%;
+                margin: 2.5% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Brochures</h1>
+        <div class="brochures" id="brochuresList">
+            <div class="loading">Loading brochures...</div>
+        </div>
+    </div>
+
+    <div id="pdfModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModal()">Close</button>
+            <iframe id="pdf-viewer"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwqdiWsq8yTGxc3VkCdktcC3lUa99yME3Dzklg0-KSsmckrS-4IaovQFav8UlfhnIq-/exec';
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function getGoogleDriveThumbnail(fileId) {
+            return `https://lh3.googleusercontent.com/d/${fileId}=w400-h300-p-k-nu`;
+        }
+
+        function displayBrochures(brochures) {
+            const brochuresList = document.getElementById('brochuresList');
+            brochuresList.innerHTML = '';
+            
+            brochures.forEach(brochure => {
+                const fileId = brochure.File.match(/\/d\/(.*?)\/view/)?.[1];
+                const thumbnailUrl = fileId ? getGoogleDriveThumbnail(fileId) : null;
+                
+                const brochureElement = document.createElement('div');
+                brochureElement.className = 'brochure-card';
+                
+                const thumbnailContent = thumbnailUrl 
+                    ? `<img src="${thumbnailUrl}" alt="PDF Preview" class="thumbnail" onerror="this.parentElement.innerHTML = this.getAttribute('data-fallback')"
+                         data-fallback='<div class="thumbnail-fallback"><div class="pdf-icon">PDF</div><div class="click-to-view">Click to preview</div></div>'>`
+                    : `<div class="thumbnail-fallback"><div class="pdf-icon">PDF</div><div class="click-to-view">Click to preview</div></div>`;
+                
+                brochureElement.innerHTML = `
+                    <div class="thumbnail-container" onclick="previewPDF('${brochure.File}')">
+                        ${thumbnailContent}
+                    </div>
+                    <div class="brochure-info">
+                        <div class="brochure-name">${brochure.Name}</div>
+                        <div class="brochure-date">${formatDate(brochure.Timestamp)}</div>
+                        <div class="button-group">
+                            <a href="${brochure.File}" target="_blank" class="view-button">Download PDF</a>
+                        </div>
+                    </div>
+                `;
+                
+                brochuresList.appendChild(brochureElement);
+            });
+        }
+
+        function showError(message) {
+            const brochuresList = document.getElementById('brochuresList');
+            brochuresList.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        async function fetchBrochures() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch brochures');
+                }
+                const data = await response.json();
+                if (data && data.results) {
+                    displayBrochures(data.results);
+                } else {
+                    throw new Error('Invalid data format received');
+                }
+            } catch (error) {
+                showError('Error loading brochures. Please try again later.');
+                console.error('Error:', error);
+            }
+        }
+
+        function previewPDF(url) {
+            const fileId = url.match(/\/d\/(.*?)\/view/)?.[1];
+            if (!fileId) {
+                alert('Invalid Google Drive URL');
+                return;
+            }
+            
+            const modal = document.getElementById('pdfModal');
+            const viewer = document.getElementById('pdf-viewer');
+            
+            viewer.src = `https://drive.google.com/file/d/${fileId}/preview`;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('pdfModal');
+            const viewer = document.getElementById('pdf-viewer');
+            viewer.src = '';
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('pdfModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        fetchBrochures();
+    </script>
+</body>
+</html>
