@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eduport Marketing Materials</title>
+    <title>Eduport Brochures</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         .tab-active {
@@ -35,215 +35,210 @@
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateY(-10px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .animate-slide-in {
             animation: slideIn 0.3s ease forwards;
         }
 
-        .filter-container {
+        .tabs-container {
+            overflow-x: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
 
-        .filter-container::-webkit-scrollbar {
+        .tabs-container::-webkit-scrollbar {
             display: none;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-<div class="container mx-auto px-4 py-8">
-    <header class="text-center mb-12 animate-slide-in">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">Eduport Marketing Materials</h1>
-        <p class="text-gray-600">Find Eduport marketing materials, including brochures, posters, and videos, for all the
-            courses.</p>
-    </header>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12 animate-slide-in">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Eduport Brochures</h1>
+            <p class="text-gray-600">Explore our comprehensive collection of educational materials</p>
+        </header>
 
-    <!-- Filters Section -->
-    <div class="mb-8 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Purpose Filter -->
-            <div class="filter-container">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Purpose</label>
-                <select id="purposeFilter"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    <option value="all">All Purposes</option>
-                </select>
+        <!-- Tab Navigation -->
+        <div class="mb-8 space-y-4">
+            <!-- Purpose Tabs -->
+            <div class="border-b">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Purpose</h3>
+                <div id="purposeTabs" class="tabs-container flex space-x-6 pb-2">
+                    <!-- Purpose tabs will be dynamically inserted here -->
+                </div>
             </div>
 
-            <!-- Course Filter -->
-            <div class="filter-container">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
-                <select id="courseFilter"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    <option value="all">All Courses</option>
-                </select>
+            <!-- Course Tabs -->
+            <div class="border-b">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Course</h3>
+                <div id="courseTabs" class="tabs-container flex space-x-6 pb-2">
+                    <!-- Course tabs will be dynamically inserted here -->
+                </div>
             </div>
 
-            <!-- Type Filter -->
-            <div class="filter-container">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                <select id="typeFilter"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    <option value="all">All Types</option>
-                </select>
+            <!-- Type Tabs -->
+            <div class="border-b">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Type</h3>
+                <div id="typeTabs" class="tabs-container flex space-x-6 pb-2">
+                    <!-- Type tabs will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Clear Filters Button -->
+            <div class="flex justify-end">
+                <button onclick="clearFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition-colors duration-200">
+                    Reset All
+                </button>
             </div>
         </div>
 
-        <!-- Clear Filters Button -->
-        <div class="flex justify-end">
-            <button onclick="clearFilters()"
-                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition-colors duration-200">
-                Clear Filters
+        <div id="brochuresList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p class="mt-4 text-gray-600">Loading brochures...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdfModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-11/12 h-5/6 max-w-6xl relative">
+            <button onclick="closeModal()" class="absolute right-4 top-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
+                <span class="mr-2">Close</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
             </button>
+            <iframe id="pdf-viewer" class="w-full h-full rounded-lg pt-16"></iframe>
         </div>
     </div>
 
-    <div id="brochuresList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="col-span-full text-center py-8">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <p class="mt-4 text-gray-600">Loading brochures...</p>
-        </div>
-    </div>
-</div>
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzQBsaiPjXE-W67dk7B9IOVndUzH9hmYVecbuJ_Hw00VTVijvWOqmZoN9m2sC26pS_cNw/exec';
+        const FALLBACK_URL = 'https://raw.githubusercontent.com/eduport-tech/sales-brochure/refs/heads/main/data/res.json';
+        let allBrochures = [];
+        let currentFilters = {
+            purpose: 'all',
+            course: 'all',
+            type: 'all'
+        };
 
-<div id="pdfModal"
-     class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg w-11/12 h-5/6 max-w-6xl relative">
-        <button onclick="closeModal()"
-                class="absolute right-4 top-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
-            <span class="mr-2">Close</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
-        <iframe id="pdf-viewer" class="w-full h-full rounded-lg pt-16"></iframe>
-    </div>
-</div>
-
-<script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzQBsaiPjXE-W67dk7B9IOVndUzH9hmYVecbuJ_Hw00VTVijvWOqmZoN9m2sC26pS_cNw/exec';
-    const FALLBACK_URL = 'https://raw.githubusercontent.com/eduport-tech/sales-brochure/refs/heads/main/data/res.json';
-    let allBrochures = [];
-    let currentFilters = {
-        purpose: 'all',
-        course: 'all',
-        type: 'all'
-    };
-
-    function formatDate(dateString) {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-
-    function getGoogleDriveThumbnail(fileId) {
-        return `https://lh3.googleusercontent.com/d/${fileId}=w400-h300-p-k-nu`;
-    }
-
-    function updateFilterOptions() {
-        const purposeFilter = document.getElementById('purposeFilter');
-        const courseFilter = document.getElementById('courseFilter');
-        const typeFilter = document.getElementById('typeFilter');
-
-        // Get unique values for each filter
-        const purposes = new Set(['all']);
-        const courses = new Set(['all']);
-        const types = new Set(['all']);
-
-        // Filter brochures based on current selections
-        let filteredBrochures = allBrochures;
-
-        if (currentFilters.purpose !== 'all') {
-            filteredBrochures = filteredBrochures.filter(b => b.Purpose === currentFilters.purpose);
-        }
-        if (currentFilters.course !== 'all') {
-            filteredBrochures = filteredBrochures.filter(b => b.Course === currentFilters.course);
-        }
-        if (currentFilters.type !== 'all') {
-            filteredBrochures = filteredBrochures.filter(b => b.Type === currentFilters.type);
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
         }
 
-        // Collect available options from filtered data
-        filteredBrochures.forEach(brochure => {
-            if (brochure.Purpose) purposes.add(brochure.Purpose);
-            if (brochure.Course) courses.add(brochure.Course);
-            if (brochure.Type) types.add(brochure.Type);
-        });
+        function getGoogleDriveThumbnail(fileId) {
+            return `https://lh3.googleusercontent.com/d/${fileId}=w400-h300-p-k-nu`;
+        }
 
-        // Update select options
-        updateSelect(purposeFilter, Array.from(purposes), currentFilters.purpose);
-        updateSelect(courseFilter, Array.from(courses), currentFilters.course);
-        updateSelect(typeFilter, Array.from(types), currentFilters.type);
+        function createTabs(containerId, options, currentValue, filterType) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
 
-        displayBrochures(filteredBrochures);
-    }
+            options.forEach(option => {
+                const tab = document.createElement('button');
+                tab.className = `tab-button px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    option === currentValue ? 'tab-active' : 'text-gray-600 hover:text-gray-800'
+                }`;
+                tab.textContent = option === 'all' ? `All ${filterType}` : option;
+                tab.onclick = () => {
+                    if (filterType === 'Purpose') {
+                        currentFilters.purpose = option;
+                        currentFilters.course = 'all';
+                        currentFilters.type = 'all';
+                    } else if (filterType === 'Course') {
+                        currentFilters.course = option;
+                        currentFilters.type = 'all';
+                    } else {
+                        currentFilters.type = option;
+                    }
+                    updateTabs();
+                };
+                container.appendChild(tab);
+            });
+        }
 
-    function updateSelect(select, options, currentValue) {
-        const currentOptions = Array.from(select.options).map(opt => opt.value);
-        const newOptions = options.filter(opt => !currentOptions.includes(opt));
+        function updateTabs() {
+            let filteredBrochures = allBrochures;
 
-        // Add new options
-        newOptions.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt;
-            option.textContent = opt === 'all' ? `All ${select.id.replace('Filter', 's')}` : opt;
-            select.appendChild(option);
-        });
+            // Get unique values for each filter level
+            const purposes = new Set(['all']);
+            const courses = new Set(['all']);
+            const types = new Set(['all']);
 
-        // Remove obsolete options
-        Array.from(select.options).forEach(option => {
-            if (!options.includes(option.value) && option.value !== 'all') {
-                select.removeChild(option);
+            // Apply purpose filter
+            if (currentFilters.purpose !== 'all') {
+                filteredBrochures = filteredBrochures.filter(b => b.Purpose === currentFilters.purpose);
             }
-        });
 
-        select.value = currentValue;
-    }
+            // Collect available courses based on purpose filter
+            filteredBrochures.forEach(b => {
+                if (b.Course) courses.add(b.Course);
+            });
 
-    function displayBrochures(brochures) {
-        const brochuresList = document.getElementById('brochuresList');
-        brochuresList.innerHTML = '';
+            // Apply course filter
+            if (currentFilters.course !== 'all') {
+                filteredBrochures = filteredBrochures.filter(b => b.Course === currentFilters.course);
+            }
 
-        if (brochures.length === 0) {
-            brochuresList.innerHTML = `
+            // Collect available types based on current filters
+            filteredBrochures.forEach(b => {
+                if (b.Type) types.add(b.Type);
+            });
+
+            // Collect all purposes for the first level
+            allBrochures.forEach(b => {
+                if (b.Purpose) purposes.add(b.Purpose);
+            });
+
+            // Create tabs for each level
+            createTabs('purposeTabs', Array.from(purposes), currentFilters.purpose, 'Purpose');
+            createTabs('courseTabs', Array.from(courses), currentFilters.course, 'Course');
+            createTabs('typeTabs', Array.from(types), currentFilters.type, 'Type');
+
+            // Apply type filter for final display
+            if (currentFilters.type !== 'all') {
+                filteredBrochures = filteredBrochures.filter(b => b.Type === currentFilters.type);
+            }
+
+            displayBrochures(filteredBrochures);
+        }
+
+        function displayBrochures(brochures) {
+            const brochuresList = document.getElementById('brochuresList');
+            brochuresList.innerHTML = '';
+
+            if (brochures.length === 0) {
+                brochuresList.innerHTML = `
                     <div class="col-span-full text-center py-8">
                         <div class="bg-gray-50 rounded-lg p-8">
                             <p class="text-gray-600">No brochures found with the selected filters.</p>
                         </div>
                     </div>
                 `;
-            return;
-        }
+                return;
+            }
 
-        brochures.forEach((brochure, index) => {
-            const fileId = brochure['Upload Brochures/Poster/Video'].match(/\/d\/(.*?)\/view/)?.[1];
-            const thumbnailUrl = fileId ? getGoogleDriveThumbnail(fileId) : null;
+            brochures.forEach((brochure, index) => {
+                const fileId = brochure['Upload Brochures/Poster/Video'].match(/\/d\/(.*?)\/view/)?.[1];
+                const thumbnailUrl = fileId ? getGoogleDriveThumbnail(fileId) : null;
 
-            const brochureElement = document.createElement('div');
-            brochureElement.className = 'brochure-card bg-white rounded-xl overflow-hidden shadow-lg animate-slide-in';
-            brochureElement.style.animationDelay = `${index * 100}ms`;
+                const brochureElement = document.createElement('div');
+                brochureElement.className = 'brochure-card bg-white rounded-xl overflow-hidden shadow-lg animate-slide-in';
+                brochureElement.style.animationDelay = `${index * 100}ms`;
 
-            const thumbnailContent = thumbnailUrl
-                ? `<img src="${thumbnailUrl}" alt="PDF Preview" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML = this.getAttribute('data-fallback')"
+                const thumbnailContent = thumbnailUrl
+                    ? `<img src="${thumbnailUrl}" alt="PDF Preview" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML = this.getAttribute('data-fallback')"
                          data-fallback='<div class="flex flex-col items-center justify-center h-full bg-gray-100"><div class="bg-red-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold">PDF</div><div class="mt-4 text-gray-500 text-sm">Click to preview</div></div>'>`
-                : `<div class="flex flex-col items-center justify-center h-full bg-gray-100"><div class="bg-red-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold">PDF</div><div class="mt-4 text-gray-500 text-sm">Click to preview</div></div>`;
+                    : `<div class="flex flex-col items-center justify-center h-full bg-gray-100"><div class="bg-red-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold">PDF</div><div class="mt-4 text-gray-500 text-sm">Click to preview</div></div>`;
 
-            const purposeTag = brochure.Purpose
-                ? `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${brochure.Purpose}</span>`
-                : '';
-
-            brochureElement.innerHTML = `
+                brochureElement.innerHTML = `
                     <div class="thumbnail-container h-48 overflow-hidden cursor-pointer" onclick="previewPDF('${brochure['Upload Brochures/Poster/Video']}')">
                         ${thumbnailContent}
                     </div>
@@ -251,7 +246,7 @@
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">${brochure['Name of the Course']}</h3>
                         <p class="text-gray-500 text-sm mb-4">${formatDate(brochure.Timestamp)}</p>
                         <div class="flex flex-wrap gap-2 mb-4">
-                            ${purposeTag}
+                            ${brochure.Purpose ? `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${brochure.Purpose}</span>` : ''}
                             ${brochure.Course ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${brochure.Course}</span>` : ''}
                             ${brochure.Type ? `<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${brochure.Type}</span>` : ''}
                         </div>
@@ -264,22 +259,22 @@
                     </div>
                 `;
 
-            brochuresList.appendChild(brochureElement);
-        });
-    }
+                brochuresList.appendChild(brochureElement);
+            });
+        }
 
-    function clearFilters() {
-        currentFilters = {
-            purpose: 'all',
-            course: 'all',
-            type: 'all'
-        };
-        updateFilterOptions();
-    }
+        function clearFilters() {
+            currentFilters = {
+                purpose: 'all',
+                course: 'all',
+                type: 'all'
+            };
+            updateTabs();
+        }
 
-    function showError(message) {
-        const brochuresList = document.getElementById('brochuresList');
-        brochuresList.innerHTML = `
+        function showError(message) {
+            const brochuresList = document.getElementById('brochuresList');
+            brochuresList.innerHTML = `
                 <div class="col-span-full">
                     <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
                         <div class="flex">
@@ -295,98 +290,73 @@
                     </div>
                 </div>
             `;
-    }
+        }
 
-    async function fetchBrochures() {
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) {
-                throw new Error('Failed to fetch from primary API');
-            }
-            const data = await response.json();
-            if (data && data.results) {
-                allBrochures = data.results;
-                updateFilterOptions();
-            } else
-                throw new Error('Invalid data format received');
-        } catch (error) {
-            console.error('Primary API Error:', error);
+        async function fetchBrochures() {
             try {
-                const fallbackResponse = await fetch(FALLBACK_URL);
-                if (!fallbackResponse.ok) {
-                    throw new Error('Failed to fetch from fallback API');
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch from primary API');
                 }
-                const fallbackData = await fallbackResponse.json();
-                if (fallbackData && fallbackData.results) {
-                    allBrochures = fallbackData.results;
-                    updateFilterOptions();
+                const data = await response.json();
+                if (data && data.results) {
+                    allBrochures = data.results;
+                    updateTabs();
                 } else {
-                    throw new Error('Invalid fallback data format');
+                    throw new Error('Invalid data format received');
+                }} catch (error) {
+                console.error('Primary API Error:', error);
+                try {
+                    const fallbackResponse = await fetch(FALLBACK_URL);
+                    if (!fallbackResponse.ok) {
+                        throw new Error('Failed to fetch from fallback API');
+                    }
+                    const fallbackData = await fallbackResponse.json();
+                    if (fallbackData && fallbackData.results) {
+                        allBrochures = fallbackData.results;
+                        updateTabs();
+                    } else {
+                        throw new Error('Invalid fallback data format');
+                    }
+                } catch (fallbackError) {
+                    showError('Error loading brochures. Please try again later.');
+                    console.error('Fallback Error:', fallbackError);
                 }
-            } catch (fallbackError) {
-                showError('Error loading brochures. Please try again later.');
-                console.error('Fallback Error:', fallbackError);
             }
         }
-    }
 
-    function previewPDF(url) {
-        const fileId = url.match(/\/d\/(.*?)\/view/)?.[1];
-        if (!fileId) {
-            alert('Invalid Google Drive URL');
-            return;
+        function previewPDF(url) {
+            const fileId = url.match(/\/d\/(.*?)\/view/)?.[1];
+            if (!fileId) {
+                alert('Invalid Google Drive URL');
+                return;
+            }
+
+            const modal = document.getElementById('pdfModal');
+            const viewer = document.getElementById('pdf-viewer');
+
+            viewer.src = `https://drive.google.com/file/d/${fileId}/preview`;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
-        const modal = document.getElementById('pdfModal');
-        const viewer = document.getElementById('pdf-viewer');
-
-        viewer.src = `https://drive.google.com/file/d/${fileId}/preview`;
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-        const modal = document.getElementById('pdfModal');
-        const viewer = document.getElementById('pdf-viewer');
-        viewer.src = '';
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-
-    // Add event listeners for filters
-    document.getElementById('purposeFilter').addEventListener('change', function (e) {
-        currentFilters.purpose = e.target.value;
-        // Reset other filters when purpose changes
-        if (e.target.value !== currentFilters.purpose) {
-            currentFilters.course = 'all';
-            currentFilters.type = 'all';
+        function closeModal() {
+            const modal = document.getElementById('pdfModal');
+            const viewer = document.getElementById('pdf-viewer');
+            viewer.src = '';
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
-        updateFilterOptions();
-    });
 
-    document.getElementById('courseFilter').addEventListener('change', function (e) {
-        currentFilters.course = e.target.value;
-        // Reset type filter when course changes
-        if (e.target.value !== currentFilters.course) {
-            currentFilters.type = 'all';
+        window.onclick = function(event) {
+            const modal = document.getElementById('pdfModal');
+            if (event.target === modal) {
+                closeModal();
+            }
         }
-        updateFilterOptions();
-    });
 
-    document.getElementById('typeFilter').addEventListener('change', function (e) {
-        currentFilters.type = e.target.value;
-        updateFilterOptions();
-    });
-
-    window.onclick = function (event) {
-        const modal = document.getElementById('pdfModal');
-        if (event.target === modal) {
-            closeModal();
-        }
-    }
-
-    // Initialize the page
-    fetchBrochures();
-</script>
+        // Initialize the page
+        fetchBrochures();
+    </script>
 </body>
 </html>
