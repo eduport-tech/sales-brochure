@@ -3,244 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Brochures</title>
+    <title>Eduport Brochures</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f5f5f5;
-            color: #333;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: #2d3748;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-        }
-
-        .brochures {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            padding: 1rem;
+        .tab-active {
+            border-bottom: 2px solid #4299e1;
+            color: #4299e1;
         }
 
         .brochure-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-in-out;
+            transition: all 0.3s ease;
         }
 
         .brochure-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .thumbnail-container {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            background-color: #f7fafc;
-            overflow: hidden;
-            cursor: pointer;
+        .thumbnail-container img {
+            transition: transform 0.3s ease;
         }
 
-        .thumbnail {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .thumbnail-container:hover .thumbnail {
+        .thumbnail-container:hover img {
             transform: scale(1.05);
         }
 
-        .thumbnail-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 1rem;
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
         }
 
-        .pdf-icon {
-            width: 64px;
-            height: 64px;
-            background-color: #e53e3e;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.5rem;
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        .click-to-view {
-            font-size: 0.875rem;
-            color: #718096;
-            text-align: center;
+        .animate-slide-in {
+            animation: slideIn 0.3s ease forwards;
         }
 
-        .brochure-info {
-            padding: 1rem;
+        .tabs-container {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
-        .brochure-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
-        }
-
-        .brochure-date {
-            color: #718096;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .view-button {
-            flex: 1;
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            text-align: center;
-            background-color: #4299e1;
-            color: white;
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        .view-button:hover {
-            background-color: #3182ce;
-        }
-
-        .loading {
-            text-align: center;
-            font-size: 1.25rem;
-            color: #718096;
-            padding: 2rem;
-        }
-
-        .error {
-            text-align: center;
-            color: #e53e3e;
-            padding: 2rem;
-            background: #fff5f5;
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .modal {
+        .tabs-container::-webkit-scrollbar {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.75);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: relative;
-            width: 90%;
-            height: 90%;
-            margin: 2% auto;
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .close-button {
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
-            background: #e53e3e;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .close-button:hover {
-            background: #c53030;
-        }
-
-        #pdf-viewer {
-            flex-grow: 1;
-            width: 100%;
-            height: calc(100% - 2rem);
-            border: none;
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 1rem;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .brochures {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                width: 95%;
-                height: 95%;
-                margin: 2.5% auto;
-            }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>PDF Brochures</h1>
-        <div class="brochures" id="brochuresList">
-            <div class="loading">Loading brochures...</div>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12 animate-slide-in">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Eduport Brochures</h1>
+            <p class="text-gray-600">Explore our comprehensive collection of educational materials</p>
+        </header>
+
+        <div class="flex justify-center mb-8 border-b">
+            <div id="tabsContainer" class="tabs-container flex space-x-6">
+                <!-- Tabs will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <div id="brochuresList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p class="mt-4 text-gray-600">Loading brochures...</p>
+            </div>
         </div>
     </div>
 
-    <div id="pdfModal" class="modal">
-        <div class="modal-content">
-            <button class="close-button" onclick="closeModal()">Close</button>
-            <iframe id="pdf-viewer"></iframe>
+    <div id="pdfModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-11/12 h-5/6 max-w-6xl relative">
+            <button onclick="closeModal()" class="absolute right-4 top-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
+                <span class="mr-2">Close</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <iframe id="pdf-viewer" class="w-full h-full rounded-lg pt-16"></iframe>
         </div>
     </div>
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbzQBsaiPjXE-W67dk7B9IOVndUzH9hmYVecbuJ_Hw00VTVijvWOqmZoN9m2sC26pS_cNw/exec';
+        const FALLBACK_URL = 'https://raw.githubusercontent.com/eduport-tech/sales-brochure/refs/heads/main/data/res.json';
+        let allBrochures = [];
 
         function formatDate(dateString) {
             return new Date(dateString).toLocaleDateString('en-US', {
@@ -254,59 +102,157 @@
             return `https://lh3.googleusercontent.com/d/${fileId}=w400-h300-p-k-nu`;
         }
 
-        function displayBrochures(brochures) {
+        function createTabs(brochures) {
+            const tabsContainer = document.getElementById('tabsContainer');
+            const purposes = new Set(['all']);
+
+            // Collect all unique purposes
+            brochures.forEach(brochure => {
+                if (brochure.Purpose && brochure.Purpose.trim()) {
+                    brochure.Purpose.split(',').forEach(purpose => {
+                        purposes.add(purpose.trim());
+                    });
+                }
+            });
+
+            // Create tabs
+            tabsContainer.innerHTML = Array.from(purposes)
+                .map((purpose, index) => `
+                    <button class="tab-button ${index === 0 ? 'tab-active' : 'text-gray-600'}
+                            px-4 py-2 text-lg font-medium transition-all duration-200 whitespace-nowrap"
+                            data-filter="${purpose}">
+                        ${purpose === 'all' ? 'All Brochures' : purpose}
+                    </button>
+                `).join('');
+
+            // Add click events to tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('text-gray-600');
+                    });
+                    button.classList.add('tab-active');
+                    button.classList.remove('text-gray-600');
+                    displayBrochures(allBrochures, button.dataset.filter);
+                });
+            });
+        }
+
+        function displayBrochures(brochures, filter = 'all') {
             const brochuresList = document.getElementById('brochuresList');
             brochuresList.innerHTML = '';
-            
-            brochures.forEach(brochure => {
-                const fileId = brochure.File.match(/\/d\/(.*?)\/view/)?.[1];
-                const thumbnailUrl = fileId ? getGoogleDriveThumbnail(fileId) : null;
-                
-                const brochureElement = document.createElement('div');
-                brochureElement.className = 'brochure-card';
-                
-                const thumbnailContent = thumbnailUrl 
-                    ? `<img src="${thumbnailUrl}" alt="PDF Preview" class="thumbnail" onerror="this.parentElement.innerHTML = this.getAttribute('data-fallback')"
-                         data-fallback='<div class="thumbnail-fallback"><div class="pdf-icon">PDF</div><div class="click-to-view">Click to preview</div></div>'>`
-                    : `<div class="thumbnail-fallback"><div class="pdf-icon">PDF</div><div class="click-to-view">Click to preview</div></div>`;
-                
-                brochureElement.innerHTML = `
-                    <div class="thumbnail-container" onclick="previewPDF('${brochure.File}')">
-                        ${thumbnailContent}
-                    </div>
-                    <div class="brochure-info">
-                        <div class="brochure-name">${brochure.Name}</div>
-                        <div class="brochure-date">${formatDate(brochure.Timestamp)}</div>
-                        <div class="button-group">
-                            <a href="${brochure.File}" target="_blank" class="view-button">Download PDF</a>
+
+            const filteredBrochures = filter === 'all'
+                ? brochures
+                : brochures.filter(b => b.Purpose && b.Purpose.split(',').some(p => p.trim() === filter));
+
+            if (filteredBrochures.length === 0) {
+                brochuresList.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <div class="bg-gray-50 rounded-lg p-8">
+                            <p class="text-gray-600">No brochures found for this category.</p>
                         </div>
                     </div>
                 `;
-                
+                return;
+            }
+
+            filteredBrochures.forEach((brochure, index) => {
+                const fileId = brochure.File.match(/\/d\/(.*?)\/view/)?.[1];
+                const thumbnailUrl = fileId ? getGoogleDriveThumbnail(fileId) : null;
+
+                const brochureElement = document.createElement('div');
+                brochureElement.className = 'brochure-card bg-white rounded-xl overflow-hidden shadow-lg animate-slide-in';
+                brochureElement.style.animationDelay = `${index * 100}ms`;
+
+                const thumbnailContent = thumbnailUrl
+                    ? `<img src="${thumbnailUrl}" alt="PDF Preview" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML = this.getAttribute('data-fallback')"
+                         data-fallback='<div class="flex flex-col items-center justify-center h-full bg-gray-100"><div class="bg-red-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold">PDF</div><div class="mt-4 text-gray-500 text-sm">Click to preview</div></div>'>`
+                    : `<div class="flex flex-col items-center justify-center h-full bg-gray-100"><div class="bg-red-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold">PDF</div><div class="mt-4 text-gray-500 text-sm">Click to preview</div></div>`;
+
+                const purposeTags = brochure.Purpose
+                    ? `<div class="flex flex-wrap gap-2 mb-4">
+                        ${brochure.Purpose.split(',').map(purpose =>
+                            `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${purpose.trim()}</span>`
+                        ).join('')}
+                       </div>`
+                    : '';
+
+                brochureElement.innerHTML = `
+                    <div class="thumbnail-container h-48 overflow-hidden cursor-pointer" onclick="previewPDF('${brochure.File}')">
+                        ${thumbnailContent}
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">${brochure.Name}</h3>
+                        <p class="text-gray-500 text-sm mb-4">${formatDate(brochure.Timestamp)}</p>
+                        ${purposeTags}
+                        <div class="flex space-x-3">
+                            <a href="${brochure.File}" target="_blank"
+                               class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-center transition-colors duration-200">
+                                Download PDF
+                            </a>
+                        </div>
+                    </div>
+                `;
+
                 brochuresList.appendChild(brochureElement);
             });
         }
 
         function showError(message) {
             const brochuresList = document.getElementById('brochuresList');
-            brochuresList.innerHTML = `<div class="error">${message}</div>`;
+            brochuresList.innerHTML = `
+                <div class="col-span-full">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-red-700">${message}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         async function fetchBrochures() {
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) {
-                    throw new Error('Failed to fetch brochures');
+                    throw new Error('Failed to fetch from primary API');
                 }
                 const data = await response.json();
                 if (data && data.results) {
+                    allBrochures = data.results;
+                    createTabs(data.results);
                     displayBrochures(data.results);
                 } else {
                     throw new Error('Invalid data format received');
                 }
             } catch (error) {
-                showError('Error loading brochures. Please try again later.');
-                console.error('Error:', error);
+                console.error('Primary API Error:', error);
+                try {
+                    const fallbackResponse = await fetch(FALLBACK_URL);
+                    if (!fallbackResponse.ok) {
+                        throw new Error('Failed to fetch from fallback API');
+                    }
+                    const fallbackData = await fallbackResponse.json();
+                    if (fallbackData && fallbackData.results) {
+                        allBrochures = fallbackData.results;
+                        createTabs(fallbackData.results);
+                        displayBrochures(fallbackData.results);
+                    } else {
+                        throw new Error('Invalid fallback data format');
+                    }
+                } catch (fallbackError) {
+                    showError('Error loading brochures. Please try again later.');
+                    console.error('Fallback Error:', fallbackError);
+                }
             }
         }
 
@@ -316,19 +262,21 @@
                 alert('Invalid Google Drive URL');
                 return;
             }
-            
+
             const modal = document.getElementById('pdfModal');
             const viewer = document.getElementById('pdf-viewer');
-            
+
             viewer.src = `https://drive.google.com/file/d/${fileId}/preview`;
-            modal.style.display = 'block';
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
             const modal = document.getElementById('pdfModal');
             const viewer = document.getElementById('pdf-viewer');
             viewer.src = '';
-            modal.style.display = 'none';
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
 
         window.onclick = function(event) {
