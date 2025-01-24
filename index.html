@@ -2,302 +2,362 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Purchase Platform</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduport Marketing Materials</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
+        .tab-active {
+            border-bottom: 2px solid #4299e1;
+            color: #4299e1;
+        }
+
         .brochure-card {
             transition: all 0.3s ease;
         }
+
         .brochure-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
+        .thumbnail-container img {
+            transition: transform 0.3s ease;
+        }
+
+        .thumbnail-container:hover img {
+            transform: scale(1.05);
+        }
+
         .modal-backdrop {
             backdrop-filter: blur(4px);
         }
+
         @keyframes slideIn {
             from { transform: translateY(-10px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+
         .animate-slide-in {
             animation: slideIn 0.3s ease forwards;
         }
-        .error-input {
-            border-color: red;
+
+        .tabs-container {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
-        .grade-tab {
-            transition: all 0.3s ease;
-        }
-        .grade-tab.active {
-            background-color: #3B82F6;
-            color: white;
+
+        .tabs-container::-webkit-scrollbar {
+            display: none;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <header class="bg-white shadow-md">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <img src="image.png" alt="Company Logo" class="h-10 mr-4">
-                <h1 class="text-xl font-bold text-gray-800 hidden md:block">Course Platform</h1>
-            </div>
-            <div class="text-gray-700 font-medium">
-                <a href="tel:+919876543210" class="flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3H8a2 2 0 00-2 2v14a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3L12 7 8 3"/>
-                    </svg>
-                    +91 98765 43210
-                </a>
-            </div>
-        </div>
-    </header>
-
     <div class="container mx-auto px-4 py-8">
         <header class="text-center mb-12 animate-slide-in">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Available Courses</h2>
-            <p class="text-gray-600">Explore and purchase our courses</p>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Eduport Marketing Materials</h1>
+            <p class="text-gray-600">Find Eduport marketing materials, including brochures, posters, and videos, for all the courses.</p>
         </header>
+ <!-- Course Tabs -->
+            <div class="border-b">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Course</h3>
+                <div id="courseTabs" class="tabs-container flex space-x-6 pb-2">
+                    <!-- Course tabs will be dynamically inserted here -->
+                </div>
+            </div>
+        <!-- Tab Navigation -->
+        <div class="mb-8 space-y-4">
+            <!-- Purpose Tabs -->
+            <div class="border-b">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Purpose</h3>
+                <div id="purposeTabs" class="tabs-container flex space-x-6 pb-2">
+                    <!-- Purpose tabs will be dynamically inserted here -->
+                </div>
+            </div>
 
-        <div id="grade-tabs" class="flex justify-center space-x-4 mb-8">
-            <button onclick="filterCoursesByGrade('all')" class="grade-tab px-4 py-2 bg-blue-500 text-white rounded-lg active" data-grade="all">
-                All
-            </button>
+
+
+            <!-- Type Tabs -->
+            <div class="border-b">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Type</h3>
+                <div id="typeTabs" class="tabs-container flex space-x-6 pb-2">
+                    <!-- Type tabs will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Clear Filters Button -->
+            <div class="flex justify-end">
+                <button onclick="clearFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition-colors duration-200">
+                    Reset All
+                </button>
+            </div>
         </div>
 
-        <div id="courses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="brochuresList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="col-span-full text-center py-8">
                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                <p class="mt-4 text-gray-600">Loading courses...</p>
+                <p class="mt-4 text-gray-600">Loading brochures...</p>
             </div>
         </div>
     </div>
 
-    <div id="purchase-modal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg w-11/12 max-w-md relative p-6">
-            <button onclick="closePurchaseModal()" class="absolute right-4 top-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
+    <div id="pdfModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-11/12 h-5/6 max-w-6xl relative">
+            <button onclick="closeModal()" class="absolute right-4 top-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
                 <span class="mr-2">Close</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
-            <h2 class="text-2xl font-bold mb-6">Purchase Course</h2>
-            <form id="purchase-form" novalidate>
-                <input type="text" name="name" placeholder="Full Name" class="w-full mb-4 p-2 border rounded" required>
-                <input type="email" name="email" placeholder="Email Address" class="w-full mb-4 p-2 border rounded" required>
-                <div id="email-error" class="text-red-500 text-sm mb-2 hidden">Please enter a valid email address</div>
-                <input type="tel" name="phone" placeholder="Registered Mobile Number" class="w-full mb-4 p-2 border rounded" required>
-                <div id="phone-error" class="text-red-500 text-sm mb-2 hidden">Please enter a valid 10-digit mobile number</div>
-                <input type="tel" name="alt-phone" placeholder="Alternative Mobile Number" class="w-full mb-4 p-2 border rounded">
-                <input type="hidden" name="course-id" id="selected-course-id">
-                <input type="hidden" name="course-amount" id="selected-course-amount">
-                <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-                    Proceed to Pay
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div id="payment-confirmation" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg w-11/12 max-w-md p-6 text-center">
-            <h2 class="text-2xl font-bold mb-4">Payment Confirmation</h2>
-            <p id="payment-status" class="mb-4"></p>
-            <button id="close-confirmation" class="bg-blue-500 text-white px-4 py-2 rounded">Close</button>
+            <iframe id="pdf-viewer" class="w-full h-full rounded-lg pt-16"></iframe>
         </div>
     </div>
 
     <script>
-        const API_URL = 'https://raw.githubusercontent.com/eduport-tech/course-purchase/refs/heads/main/data/res.json';
-        let allCourses = [];
+        const API_URL = 'https://raw.githubusercontent.com/eduport-tech/sales-brochure/refs/heads/main/data/res.json';
+        const FALLBACK_URL = 'https://script.google.com/macros/s/AKfycbzQBsaiPjXE-W67dk7B9IOVndUzH9hmYVecbuJ_Hw00VTVijvWOqmZoN9m2sC26pS_cNw/exec';
+        
+        let allBrochures = [];
+        let currentFilters = {
+            purpose: 'all',
+            course: 'all',
+            type: 'all'
+        };
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
 
         function getGoogleDriveThumbnail(fileId) {
             return `https://lh3.googleusercontent.com/d/${fileId}=w400-h300-p-k-nu`;
         }
 
-        async function fetchCourses() {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                allCourses = data.results;
-                console.log(allCourses);
-                renderCourses(allCourses);
-                createGradeTabs(allCourses);
-            } catch (error) {
-                console.error('Error fetching courses:', error);
-                document.getElementById('courses-container').innerHTML =
-                    '<div class="col-span-full text-center text-red-500">Failed to load courses. Please try again later.</div>';
+        function createTabs(containerId, options, currentValue, filterType) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            options.forEach(option => {
+                const tab = document.createElement('button');
+                tab.className = `tab-button px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    option === currentValue ? 'tab-active' : 'text-gray-600 hover:text-gray-800'
+                }`;
+                tab.textContent = option === 'all' ? `All ${filterType}` : option;
+                tab.onclick = () => {
+                    if (filterType === 'Purpose') {
+                        currentFilters.purpose = option;
+                        currentFilters.course = 'all';
+                        currentFilters.type = 'all';
+                    } else if (filterType === 'Course') {
+                        currentFilters.course = option;
+                        currentFilters.type = 'all';
+                    } else {
+                        currentFilters.type = option;
+                    }
+                    updateTabs();
+                };
+                container.appendChild(tab);
+            });
+        }
+
+        function updateTabs() {
+            let filteredBrochures = allBrochures;
+
+            // Get unique values for each filter level
+            const purposes = new Set(['all']);
+            const courses = new Set(['all']);
+            const types = new Set(['all']);
+
+            // Apply purpose filter
+            if (currentFilters.purpose !== 'all') {
+                filteredBrochures = filteredBrochures.filter(b => b.Purpose === currentFilters.purpose);
             }
-        }
 
-        function createGradeTabs(courses) {
-            const gradeTabs = document.getElementById('grade-tabs');
-            const uniqueGrades = [...new Set(courses.map(course => course.Grade))];
-
-            uniqueGrades.forEach(grade => {
-                const button = document.createElement('button');
-                button.textContent = `${grade}`.toUpperCase();
-                button.classList.add('grade-tab', 'px-4', 'py-2', 'bg-gray-200', 'rounded-lg');
-                button.setAttribute('data-grade', grade);
-                button.onclick = () => filterCoursesByGrade(grade);
-                gradeTabs.appendChild(button);
-            });
-        }
-
-        function filterCoursesByGrade(grade) {
-            const tabs = document.querySelectorAll('.grade-tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active', 'bg-blue-500', 'text-white');
-                tab.classList.add('bg-gray-200');
+            // Collect available courses based on purpose filter
+            filteredBrochures.forEach(b => {
+                if (b.Course) courses.add(b.Course);
             });
 
-            const selectedTab = document.querySelector(`[data-grade="${grade}"]`);
-            selectedTab.classList.add('active', 'bg-blue-500', 'text-white');
+            // Apply course filter
+            if (currentFilters.course !== 'all') {
+                filteredBrochures = filteredBrochures.filter(b => b.Course === currentFilters.course);
+            }
 
-            const filteredCourses = grade === 'all'
-                ? allCourses
-                : allCourses.filter(course => course.Grade === grade);
+            // Collect available types based on current filters
+            filteredBrochures.forEach(b => {
+                if (b.Type) types.add(b.Type);
+            });
 
-            renderCourses(filteredCourses);
+            // Collect all purposes for the first level
+            allBrochures.forEach(b => {
+                if (b.Purpose) purposes.add(b.Purpose);
+            });
+
+            // Create tabs for each level
+            createTabs('purposeTabs', Array.from(purposes), currentFilters.purpose, 'Purpose');
+            createTabs('courseTabs', Array.from(courses), currentFilters.course, 'Course');
+            createTabs('typeTabs', Array.from(types), currentFilters.type, 'Type');
+
+            // Apply type filter for final display
+            if (currentFilters.type !== 'all') {
+                filteredBrochures = filteredBrochures.filter(b => b.Type === currentFilters.type);
+            }
+
+            displayBrochures(filteredBrochures);
         }
 
-        function renderCourses(courses) {
-            const coursesContainer = document.getElementById('courses-container');
-            coursesContainer.innerHTML = courses.map((course, index) => {
-                const fileId = course['Course Image'].match(/\/d\/(.*?)\/view/)?.[1];
+        function displayBrochures(brochures) {
+            const brochuresList = document.getElementById('brochuresList');
+            brochuresList.innerHTML = '';
+
+            if (brochures.length === 0) {
+                brochuresList.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <div class="bg-gray-50 rounded-lg p-8">
+                            <p class="text-gray-600">No brochures found with the selected filters.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            brochures.forEach((brochure, index) => {
+                const fileId = brochure['Upload Brochures/Poster/Video'].match(/\/d\/(.*?)\/view/)?.[1];
                 const thumbnailUrl = fileId ? getGoogleDriveThumbnail(fileId) : null;
 
-                const originalPrice = parseInt(course['Batch Amount']);
-                const discountedPrice = Math.floor(originalPrice / 2);
+                const brochureElement = document.createElement('div');
+                brochureElement.className = 'brochure-card bg-white rounded-xl overflow-hidden shadow-lg animate-slide-in';
+                brochureElement.style.animationDelay = `${index * 100}ms`;
 
-                return `
-                <div class="brochure-card bg-white rounded-xl overflow-hidden shadow-lg animate-slide-in" style="animation-delay: ${index * 100}ms">
-                    <div class="h-48 overflow-hidden">
-                        <img src="${thumbnailUrl || course['Course Image']}" alt="${course['Course Name']}" class="w-full h-full object-cover">
+                const thumbnailContent = thumbnailUrl
+                    ? `<img src="${thumbnailUrl}" alt="PDF Preview" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML = this.getAttribute('data-fallback')"
+                         data-fallback='<div class="flex flex-col items-center justify-center h-full bg-gray-100"><div class="bg-red-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold">PDF</div><div class="mt-4 text-gray-500 text-sm">Click to preview</div></div>'>`
+                    : `<div class="flex flex-col items-center justify-center h-full bg-gray-100"><div class="bg-red-500 text-white w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold">PDF</div><div class="mt-4 text-gray-500 text-sm">Click to preview</div></div>`;
+
+                brochureElement.innerHTML = `
+                    <div class="thumbnail-container h-48 overflow-hidden cursor-pointer" onclick="previewPDF('${brochure['Upload Brochures/Poster/Video']}')">
+                        ${thumbnailContent}
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">${course['Course Name']}</h3>
-<span class="bg-blue-100 mr-2 my-2 text-blue-800 text-xs px-2 py-1 rounded-full">Batch: ${course['Batch ID']} </span>
-<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Grade ${course.Grade.toUpperCase()}</span>
-<!--
-<p class="text-gray-500 text-sm mb-4">Batch: ${course['Batch ID']} | Grade: ${course.Grade.toUpperCase()}</p>-->
-                        <div class="flex items-center mb-4">
-                            <p class="text-sm text-gray-500 line-through mr-3">₹${originalPrice}</p>
-                            <p class="text-lg font-bold text-green-600">₹${discountedPrice}</p>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">${brochure['Name of the Course']}</h3>
+                        <p class="text-gray-500 text-sm mb-4">${formatDate(brochure.Timestamp)}</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${brochure.Purpose ? `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${brochure.Purpose}</span>` : ''}
+                            ${brochure.Course ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${brochure.Course}</span>` : ''}
+                            ${brochure.Type ? `<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${brochure.Type}</span>` : ''}
                         </div>
-                        <button onclick="openPurchaseModal(${course['Batch ID']}, ${discountedPrice})"
-                                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-center transition-colors duration-200">
-                            Buy Now
-                        </button>
+                        <div class="flex space-x-3">
+                            <a href="${brochure['Upload Brochures/Poster/Video']}" target="_blank"
+                               class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-center transition-colors duration-200">
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                brochuresList.appendChild(brochureElement);
+            });
+        }
+
+        function clearFilters() {
+            currentFilters = {
+                purpose: 'all',
+                course: 'all',
+                type: 'all'
+            };
+            updateTabs();
+        }
+
+        function showError(message) {
+            const brochuresList = document.getElementById('brochuresList');
+            brochuresList.innerHTML = `
+                <div class="col-span-full">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-red-700">${message}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                `;
-            }).join('') || '<div class="col-span-full text-center text-gray-600">No courses found for this grade.</div>';
+            `;
         }
 
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(String(email).toLowerCase());
-        }
-
-        function validatePhone(phone) {
-            const re = /^[6-9]\d{9}$/;
-            return re.test(phone);
-        }
-
-        function openPurchaseModal(courseId, courseAmount) {
-            document.getElementById('selected-course-id').value = courseId;
-            document.getElementById('selected-course-amount').value = courseAmount;
-            document.getElementById('purchase-modal').classList.remove('hidden');
-        }
-
-        function closePurchaseModal() {
-            document.getElementById('purchase-modal').classList.add('hidden');
-        }
-
-        document.getElementById('purchase-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(e.target);
-            const email = formData.get('email');
-            const phone = formData.get('phone');
-
-            const emailError = document.getElementById('email-error');
-            const phoneError = document.getElementById('phone-error');
-            const emailInput = document.querySelector('input[name="email"]');
-            const phoneInput = document.querySelector('input[name="phone"]');
-
-            let isValid = true;
-
-            emailError.classList.add('hidden');
-            phoneError.classList.add('hidden');
-            emailInput.classList.remove('error-input');
-            phoneInput.classList.remove('error-input');
-
-            if (!validateEmail(email)) {
-                emailError.classList.remove('hidden');
-                emailInput.classList.add('error-input');
-                isValid = false;
-            }
-
-            if (!validatePhone(phone)) {
-                phoneError.classList.remove('hidden');
-                phoneInput.classList.add('error-input');
-                isValid = false;
-            }
-
-            if (!isValid) return;
-
-            const courseId = formData.get('course-id');
-            const courseAmount = formData.get('course-amount');
-            const name = formData.get('name');
-
-            var options = {
-                key: "rzp_test_sotrour4Ez6eFy",
-                amount: courseAmount * 100,
-                currency: "INR",
-                name: "Your Course Platform",
-                description: `Course Purchase: Batch ${courseId}`,
-                handler: function (response) {
-                    showPaymentConfirmation(true, response.razorpay_payment_id);
-                },
-                prefill: {
-                    name: name,
-                    email: email,
-                    contact: phone
-                },
-                theme: {
-                    color: "#3399cc"
+        async function fetchBrochures() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch from primary API');
                 }
-            };
-
-            var rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', function (response) {
-                showPaymentConfirmation(false, null);
-            });
-            rzp1.open();
-
-            closePurchaseModal();
-        });
-
-        function showPaymentConfirmation(success, paymentId) {
-            const confirmationModal = document.getElementById('payment-confirmation');
-            const statusText = document.getElementById('payment-status');
-
-            confirmationModal.classList.remove('hidden');
-            statusText.textContent = success
-                ? `Payment Successful! Payment ID: ${paymentId}`
-                : 'Payment Failed. Please try again.';
-
-            document.getElementById('close-confirmation').onclick = () => {
-                confirmationModal.classList.add('hidden');
-            };
+                const data = await response.json();
+                if (data && data.results) {
+                    allBrochures = data.results;
+                    updateTabs();
+                } else {
+                    throw new Error('Invalid data format received');
+                }} catch (error) {
+                console.error('Primary API Error:', error);
+                try {
+                    const fallbackResponse = await fetch(FALLBACK_URL);
+                    if (!fallbackResponse.ok) {
+                        throw new Error('Failed to fetch from fallback API');
+                    }
+                    const fallbackData = await fallbackResponse.json();
+                    if (fallbackData && fallbackData.results) {
+                        allBrochures = fallbackData.results;
+                        updateTabs();
+                    } else {
+                        throw new Error('Invalid fallback data format');
+                    }
+                } catch (fallbackError) {
+                    showError('Error loading brochures. Please try again later.');
+                    console.error('Fallback Error:', fallbackError);
+                }
+            }
         }
 
-        fetchCourses();
+        function previewPDF(url) {
+            const fileId = url.match(/\/d\/(.*?)\/view/)?.[1];
+            if (!fileId) {
+                alert('Invalid Google Drive URL');
+                return;
+            }
+
+            const modal = document.getElementById('pdfModal');
+            const viewer = document.getElementById('pdf-viewer');
+
+            viewer.src = `https://drive.google.com/file/d/${fileId}/preview`;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('pdfModal');
+            const viewer = document.getElementById('pdf-viewer');
+            viewer.src = '';
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('pdfModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize the page
+        fetchBrochures();
     </script>
 </body>
 </html>
